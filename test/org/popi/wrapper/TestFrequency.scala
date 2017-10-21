@@ -1,5 +1,3 @@
 package org.popi.wrapper
 
-class TestFrequency {
-
-}
+class TestFrequency

@@ -17,10 +17,9 @@
 
 package org.popi.tools
 
-import scala.collection.immutable.List
-import org.popi.wrapper.MathUtil
+import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
-import scala.collection.immutable.Map
+import org.popi.wrapper.MathUtil
 
 /**
  *

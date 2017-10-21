@@ -18,10 +18,9 @@
 package org.popi.analysis
 
 import scala.collection.immutable.List
-import org.popi.tools.ScaleDefiner
+import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
 import org.popi.wrapper.MathUtil
-import org.popi.analysis.result.RegressionSlope
-import org.popi.analysis.result.RegressionSlopeType
+import org.popi.tools.ScaleDefiner
 
 /**
  * Structure function exponent ζ(q) and q are related through H: ζ(q) = q*H(q)

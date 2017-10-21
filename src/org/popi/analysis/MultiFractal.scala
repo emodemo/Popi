@@ -17,17 +17,12 @@
 
 package org.popi.analysis
 
-import scala.collection.immutable.List
-import scala.collection.immutable.Map
-import org.popi.tools.DataNormalizer
-import org.popi.tools.ScaleDefiner
-import org.popi.geom.NDimensionalPoint
-import org.popi.geom.BoxCounter
-import org.popi.geom.NDimensionalBox
-import org.popi.analysis.result.RegressionSlope
-import org.popi.wrapper.MathUtil
+import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
-import org.popi.analysis.result.RegressionSlopeType
+import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
+import org.popi.geom.{BoxCounter, NDimensionalPoint, NDimensionalBox}
+import org.popi.tools.{DataNormalizer, ScaleDefiner}
+import org.popi.wrapper.MathUtil
 /**
  * Calculates the Generalized dimension for particular q
  * <li> D(q) = τ(q) / q -1
@@ -59,7 +54,7 @@ object MultiFractal {
     val points = normalizedData.transpose.map(point => new NDimensionalPoint(point))
     // box counting
     val boxesPerScale = BoxCounter.countBoxes(points, scales.map(scale => scale.toLong))
-    val filtered = boxesPerScale.filter(entry => entry._2.size >= MINIMUM_SATURATION).filter(entry => entry._2.size <= inputdataSize / (MINIMUM_SATURATION - 1))
+    val filtered = boxesPerScale.filter{case (scale, boxes) => boxes.size >= MINIMUM_SATURATION}.filter{case (scale, boxes) => boxes.size <= inputdataSize / (MINIMUM_SATURATION - 1)}
     // TODO: inputDataSize is not quite correct to be used here as some of the points might be filtered
     massFunction(filtered, inputdataSize)
   }
@@ -71,7 +66,7 @@ object MultiFractal {
    * @return
    */
   private def massFunction(boxesPerScale: Map[Long, List[NDimensionalBox]], totalPoints: Long): Map[Long, List[Double]] = {
-    boxesPerScale.map(scale => scale._1 ->  scale._2.map(box => (box.getNumberOfPoints.toDouble / totalPoints.toDouble)))
+    boxesPerScale.map{case (scale, boxes) => scale ->  boxes.map(box => (box.getNumberOfPoints.toDouble / totalPoints.toDouble))}
   }
 
  /**
@@ -89,19 +84,19 @@ object MultiFractal {
    * @return RegressionSlope, where the slope gives the Partition Function exponent τ(q)
   */
   private def partitionFunctionExponent(massesPerScale: Map[Long, List[Double]], q: Double): RegressionSlope = {
-	  // TODO: too much Java like
-	  var list = List[(Double, Double)]()
+    // TODO: too much Java like
+    var list = List[(Double, Double)]()
     if(q != 1.0){
-    	massesPerScale.foreach(entry => {
-				val s = entry._2.foldLeft(0.0)((sum, mass) => sum + MathUtil.pow(mass, q))
-				list = list.:+((MathUtil.log2(entry._1), MathUtil.log2(s)))
-    	})
+      massesPerScale.foreach{case (scale, masses) => {
+        val s = masses.foldLeft(0.0)((sum, mass) => sum + MathUtil.pow(mass, q))
+        list = list :+ ((MathUtil.log2(scale), MathUtil.log2(s)))
+			}}
     }
     else {
-      massesPerScale.foreach(entry => {
-        val s = entry._2.foldLeft(0.0)((sum, mass) => sum + (mass * MathUtil.log2(mass)))
-				list = list.:+((MathUtil.log2(entry._1), s))
-    	})
+      massesPerScale.foreach{case (scale, masses) => {
+        val s = masses.foldLeft(0.0)((sum, mass) => sum + (mass * MathUtil.log2(mass)))
+        list = list :+ ((MathUtil.log2(scale), s))
+    	}}
     }
 
     RegressionSlope(RegressionSlopeType.NonLogarithmic, list)

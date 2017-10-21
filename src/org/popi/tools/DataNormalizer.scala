@@ -17,8 +17,7 @@
 
 package org.popi.tools
 
-import scala.collection.immutable.List
-import scala.collection.immutable.Map
+import scala.collection.immutable.{List, Map}
 
 /**
  * Normalized data between given ranges.</br>
@@ -57,7 +56,7 @@ object DataNormalizer {
   * @return normalized data map with key = dimension number, value = values of the dimension
   */
   def normalizeMultiD(data: Map[Int, List[Double]], min: Long, max: Long): Map[Int, List[Long]] = {
-    data.map(dimensionEntry => dimensionEntry._1 -> normalize(dimensionEntry._2, min, max))
+    data.map{case (dim, values) => dim -> normalize(values, min, max)}
   }
 
   /**

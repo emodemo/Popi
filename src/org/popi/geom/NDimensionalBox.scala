@@ -66,9 +66,9 @@ class NDimensionalBox(val boxSize: Long, val fromCoordinates: List[Long], val to
   }
 
   private def canEquals(box: NDimensionalBox): Boolean = {
-      if(this.toCoordinates != box.toCoordinates) { false }
-      else if(this.fromCoordinates != box.fromCoordinates) { false }
-      else if(this.boxSize  != box.boxSize) { false }
-      else { true }
+    if(this.toCoordinates != box.toCoordinates) { false }
+    else if(this.fromCoordinates != box.fromCoordinates) { false }
+    else if(this.boxSize  != box.boxSize) { false }
+    else { true }
   }
 }

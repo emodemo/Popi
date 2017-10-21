@@ -17,14 +17,11 @@
 
 package org.popi.analysis
 
-import scala.collection.immutable.List
+import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
+import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
+import org.popi.tools.{DataScaler, ScaleDefiner}
 import org.popi.wrapper.MathUtil
-import org.popi.tools.ScaleDefiner
-import org.popi.tools.DataScaler
-import scala.collection.immutable.Map
-import org.popi.analysis.result.RegressionSlope
-import org.popi.analysis.result.RegressionSlopeType
 /**
  * Performs the Hurst Exponent Analysis, which gives the Rescaled Ranges over
  * scales of observations. It is based on Mandelbrot.
@@ -43,10 +40,10 @@ object HurstExponent {
   def hurstExponent(data: List[Double]): RegressionSlope = {
     val scaleSizes  = ScaleDefiner.defineScaleSizes(data.size)
     val scaledData = DataScaler.scaleBySize(data, scaleSizes)
-    val tuples = scaledData.map(entry => {
-       val sum = entry._2.map(item => rescaledRange(item)).sum
-       (entry._1.toDouble, sum / entry._2.size)
-    })
+    val tuples = scaledData.map{case (scale, items) => {
+       val sum = items.map(item => rescaledRange(item)).sum
+       (scale.toDouble, sum / items.size)
+    }}
     RegressionSlope(RegressionSlopeType.Logarithmic, tuples.toList)
    }
 
@@ -72,7 +69,7 @@ object HurstExponent {
 
     deviations.foreach(deviation => {
       deviationsCumsum += deviation
- 		  deviationsPowsum += MathUtil.pow(deviation, 2)
+      deviationsPowsum += MathUtil.pow(deviation, 2)
       deviationsCumsums += deviationsCumsum
     })
 

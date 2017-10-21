@@ -17,11 +17,9 @@
 
 package org.popi.tools
 
-import scala.collection.immutable.List
-import scala.collection.immutable.Map
-import scala.util.control.Breaks.breakable
-import scala.util.control.Breaks.break
+import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
+import scala.util.control.Breaks.{breakable, break}
 
 /**
  * Data Scalar
@@ -50,23 +48,23 @@ object DataScaler {
   def scaleBySize(data: List[Double], scaleSizes: Map[Long, Double]): Map[Double, List[List[Double]]] = {
     var result = Map[Double, List[List[Double]]]()
     // TODO: too much Java like
-    scaleSizes.foreach(entry => {
+    scaleSizes.foreach{case (scale, size) => {
        var startIndex = 0
-       var scaleSize = entry._2.toInt
+       var scaleSize = size.toInt
        var buffer = ListBuffer[List[Double]]()
        breakable {
           if(scaleSize < MINIMUM_SATURATION) { break }
           else{
-            for(j <- 0 until entry._1.toInt) {
+            for(j <- 0 until scale.toInt) {
               buffer.+=:(data.slice(startIndex, startIndex + scaleSize))
               startIndex += scaleSize
             }
           }
        }
        if(!buffer.isEmpty){
-         result += (entry._2 -> buffer.toList)
+         result += (size -> buffer.toList)
        }
-     })
+     }}
     result
   }
 
@@ -84,21 +82,21 @@ object DataScaler {
   * and so on ...
   */
   def scaleByDeltaResolution(data: List[Double], scaleSizes: Map[Long, Double]): Map[Long, List[List[Double]]] = {
-    val tmpResult = scaleSizes.map(entry => {
+    val tmpResult = scaleSizes.map{case (scale, size) => {
       // TODO: too much Java like
       var rowDataForScale = ListBuffer[List[Double]]()
-      for(i <- 0 until entry._1.toInt){
+      for(i <- 0 until scale.toInt){
         var rowData = ListBuffer[Double]()
-        for(j <- i until data.size by entry._1.toInt){
+        for(j <- i until data.size by scale.toInt){
           rowData.+=(data(j))
         }
         if(rowData.size >= MINIMUM_SATURATION){
           rowDataForScale.+=(rowData.toList)
         }
       }
-      entry._1 -> rowDataForScale.toList
-    })
+      scale -> rowDataForScale.toList
+    }}
 
-    tmpResult.filter(entry => entry._2.size >= entry._1)
+    tmpResult.filter{case (scale, size) => size.size >= scale}
   }
 }

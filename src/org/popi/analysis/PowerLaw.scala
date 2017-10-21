@@ -16,13 +16,10 @@
  */
 package org.popi.analysis
 
-import scala.collection.immutable.List
+import scala.collection.immutable.{List, Map}
+import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
+import org.popi.tools.{DataScaler, ScaleDefiner}
 import org.popi.wrapper.Frequency
-import org.popi.analysis.result.RegressionSlope
-import org.popi.analysis.result.RegressionSlopeType
-import org.popi.tools.DataScaler
-import org.popi.tools.ScaleDefiner
-import scala.collection.immutable.Map
 
 /**
  * Calculates the Power Law Exponent for the input data.</br>
@@ -44,7 +41,7 @@ object PowerLaw {
   def powerLawExponentScaled(data: List[Double]): Map[Long, RegressionSlope] = {
     val scaleSizes = ScaleDefiner.defineScaleSizes(data.size)
     val scaledData = DataScaler.scaleByDeltaResolution(data, scaleSizes)
-    scaledData.map(scale => scale._1 -> averageSlope(scale._2))
+    scaledData.map{case (scale, items) => scale -> averageSlope(items)}
   }
 
   /**
