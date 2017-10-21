@@ -46,6 +46,7 @@ class NDimensionalBox(val boxSize: Long, val fromCoordinates: List[Long], val to
     points
   }
 
+  /** @inheritdoc */
   override def hashCode: Int = {
     val prime = 31
     val hash = 32
@@ -57,6 +58,7 @@ class NDimensionalBox(val boxSize: Long, val fromCoordinates: List[Long], val to
     result
   }
 
+  /** @inheritdoc */
   override def equals(that: Any): Boolean = {
     if(that.isInstanceOf[NDimensionalBox]) {
       canEquals(that.asInstanceOf[NDimensionalBox]) && this.hashCode() == that.hashCode()

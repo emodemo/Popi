@@ -47,14 +47,16 @@ object MultiFractal {
   }
 
   private def massesPerScale(data:List[List[Double]]): Map[Long, List[Double]] = {
-    val inputdataSize = data.last.size
+    val inputDatat = data.lastOption.getOrElse(List.empty)
+    val inputdataSize = inputDatat.size
     val scales = ScaleDefiner.defineScaleResolutions(inputdataSize)
     // make normalized data to points
     val normalizedData = DataNormalizer.normalizeMultiD(data, 0L, scales.max.toLong)
     val points = normalizedData.transpose.map(point => new NDimensionalPoint(point))
     // box counting
     val boxesPerScale = BoxCounter.countBoxes(points, scales.map(scale => scale.toLong))
-    val filtered = boxesPerScale.filter{case (scale, boxes) => boxes.size >= MINIMUM_SATURATION}.filter{case (scale, boxes) => boxes.size <= inputdataSize / (MINIMUM_SATURATION - 1)}
+    val filtered = boxesPerScale.filter{case (scale, boxes) => boxes.size >= MINIMUM_SATURATION}
+                                .filter{case (scale, boxes) => boxes.size <= inputdataSize / (MINIMUM_SATURATION - 1)}
     // TODO: inputDataSize is not quite correct to be used here as some of the points might be filtered
     massFunction(filtered, inputdataSize)
   }
@@ -90,7 +92,8 @@ object MultiFractal {
       massesPerScale.foreach{case (scale, masses) => {
         val s = masses.foldLeft(0.0)((sum, mass) => sum + MathUtil.pow(mass, q))
         list = list :+ ((MathUtil.log2(scale), MathUtil.log2(s)))
-			}}
+        }
+      }
     }
     else {
       massesPerScale.foreach{case (scale, masses) => {

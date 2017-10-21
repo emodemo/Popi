@@ -18,8 +18,7 @@
 package org.popi.analysis.result
 
 import scala.collection.immutable.List
-import org.popi.wrapper.SimpleRegression
-import org.popi.wrapper.MathUtil
+import org.popi.wrapper.{MathUtil, SimpleRegression}
 
 /**
  * Companion Object for {@link RegressionSlope}
@@ -60,7 +59,7 @@ object RegressionSlope {
   }
 
   private def createLogarithmic(xyAxis: List[(Double, Double)]): RegressionSlope = {
-    val logLogAxis = xyAxis.map(entry => MathUtil.log2(entry._1) -> MathUtil.log2(entry._2))
+    val logLogAxis = xyAxis.map{case (x, y) => MathUtil.log2(x) -> MathUtil.log2(y)}
     val sr = new SimpleRegression
     sr.init(logLogAxis)
     new RegressionSlope(sr.slope, sr.slopeCI, sr.ssr, sr.r, sr.rSquare, sr.significance, sr.intercept, logLogAxis)

@@ -28,11 +28,13 @@ import scala.collection.immutable.List
  */
 class NDimensionalPoint(val coordinates: List[Long])  {
 
+  /** @inheritdoc */
   override def hashCode: Int = {
     val prime = 31
     prime + coordinates.hashCode()
   }
 
+  /** @inheritdoc */
   override def equals(that: Any): Boolean = {
     if(that.isInstanceOf[NDimensionalPoint]) {
       canEquals(that.asInstanceOf[NDimensionalPoint]) && this.hashCode() == that.hashCode()
