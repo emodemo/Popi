@@ -1,5 +1,7 @@
 **POPI** is a small data analysis API focused on determining scaling properties of input data
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0a2862dcb7ff43b082ef85cc2746623f)](https://www.codacy.com/app/nos_jelezen/Popi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emodemo/Popi&amp;utm_campaign=Badge_Grade)
+
 #### <i class="icon-pencil"></i> User Guide
 Users only need to use the classes inside the `org.popi.analysis` package. 
 More examples and comparisons with theoretical values can be found in the tests of `org.popi.analysis`
