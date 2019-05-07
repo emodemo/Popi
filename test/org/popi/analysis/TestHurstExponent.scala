@@ -28,6 +28,6 @@ class TestHurstExponent extends FunSuite with Matchers {
   test("rescaled range") {
     val data = List(1.0, 2.0, 3.0, 1.0, 1.0, 4.0)
     val result = HurstExponent.rescaledRange(data)
-    result should be(1.73205 +- 0.00005)
+    result should be (1.73205 +- 0.00005)
   }
 }

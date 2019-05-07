@@ -11,7 +11,7 @@ class TestPowerLaw extends FunSuite with Matchers {
   test("alpha 0.5") {
     val data = DataReader.readFromFile("alpha0.5N1000.txt")
     val slope = PowerLaw.powerLawExponent(data)
-    slope.slope should be(-0.5 +- 0.05)
+    slope.slope should be (-0.5 +- 0.05)
   }
 
   // shuffling should NOT CHANGE results on tested scales
@@ -19,25 +19,25 @@ class TestPowerLaw extends FunSuite with Matchers {
     val data = DataReader.readFromFile("alpha0.5N1000.txt")
     val dataShuffle = Random.shuffle(data)
     val slope = PowerLaw.powerLawExponent(dataShuffle)
-    slope.slope should be(-0.5 +- 0.05)
+    slope.slope should be (-0.5 +- 0.05)
   }
 
   test("alpha 1.0") {
     val data = DataReader.readFromFile("alpha1N1000.txt")
     val slope = PowerLaw.powerLawExponent(data)
-    slope.slope should be(-1.0 +- 0.05)
+    slope.slope should be (-1.0 +- 0.05)
   }
 
   test("alpha 1.5") {
     val data = DataReader.readFromFile("alpha1.5N1000.txt")
     val slope = PowerLaw.powerLawExponent(data)
-    slope.slope should be(-1.5 +- 0.05)
+    slope.slope should be (-1.5 +- 0.05)
   }
 
   test("alpha 2.0") {
     val data = DataReader.readFromFile("alpha2N1000.txt")
     val slope = PowerLaw.powerLawExponent(data)
-    slope.slope should be(-2.0 +- 0.05)
+    slope.slope should be (-2.0 +- 0.05)
   }
 
   test("alpha 2.5") {

@@ -29,4 +29,4 @@ import scala.collection.immutable.List
  * @author Emiliyan Todorov
  *
  */
-case class Box(fromCoordinates: List[Long], toCoordinates: List[Long]) {}
+case class Box(fromCoordinates: List[Long], toCoordinates: List[Long])

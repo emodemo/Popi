@@ -49,6 +49,12 @@ case class SimpleRegression private(slope: Double,
  *
  */
 object SimpleRegression {
+
+  /**
+    * @param xyAxis the axis
+    * @return the regression slope
+    *
+    */
   def apply(xyAxis: List[(Double, Double)]): SimpleRegression = {
     val sr = new org.apache.commons.math3.stat.regression.SimpleRegression()
     val array = Array.ofDim[Double](xyAxis.length, 2)

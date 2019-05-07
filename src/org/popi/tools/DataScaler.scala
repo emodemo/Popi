@@ -51,11 +51,12 @@ object DataScaler {
       var startIndex = 0
       var scaleSize = size.toInt
       val buffer = ListBuffer[List[Double]]()
-      if (scaleSize >= minimumSaturation)
+      if (scaleSize >= minimumSaturation) {
         for (_ <- 0 until scale.toInt) {
           buffer.+=:(data.slice(startIndex, startIndex + scaleSize))
           startIndex += scaleSize
         }
+      }
       if (buffer.nonEmpty) {
         result += (size -> buffer.toList)
       }

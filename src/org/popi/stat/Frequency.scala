@@ -21,6 +21,7 @@ import scala.collection.immutable.List
 
 /**
  * A wrapper for frequencies. Currently it uses apache.commons but may change in the future
+ * @param frequency the apache math Frequency
  *
  * @author Emiliyan Todorov
  *
@@ -35,6 +36,9 @@ class Frequency private(val frequency: org.apache.commons.math3.stat.Frequency){
   def cumulativePercentage(value: Double): Double = frequency.getCumPct(value)
 }
 
+/**
+  * Companion object for Frequency
+  */
 object Frequency {
   def apply(data: List[Double]): Frequency = {
     val frequency = new org.apache.commons.math3.stat.Frequency
