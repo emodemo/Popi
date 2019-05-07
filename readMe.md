@@ -1,21 +1,24 @@
+# POPI
+
 **POPI** is a small data analysis API focused on determining scaling properties of input data
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0a2862dcb7ff43b082ef85cc2746623f)](https://www.codacy.com/app/nos_jelezen/Popi?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emodemo/Popi&amp;utm_campaign=Badge_Grade)
 
-#### <i class="icon-pencil"></i> User Guide
-Users only need to use the classes inside the `org.popi.analysis` package. 
+## User Guide
+
+Users only need to use the classes inside the `org.popi.analysis` package.
 More examples and comparisons with theoretical values can be found in the tests of `org.popi.analysis`
 
 ```scala
-    val pw = PowerLaw.powerLawExponentScaled(data)
-    val hurst = HurstExponent.hurstExponent(data)
-    val genHurst = GeneralizedHurstExponent.generalizedHurstExponent(data, 1) 
-    val mf = MultiFractal.multiFractals(data, 0)
+val pw = PowerLaw.powerLawExponent(data)
+val hurst = HurstExponent.hurstExponent(data)
+val genHurst = GeneralizedHurstExponent.generalizedHurstExponent(data, 1)
+val mf = MultiFractal.multiFractals(data, 0)
 ```
 
-#### <i class="icon-pencil"></i> Test results for fractal dimension
+## Test results for fractal dimension
 
-|  Figure  	|Computed|Theoretical|
+|  Figure   |Computed|Theoretical|
 | :-------- | :----: | :-------: |
 | Koch      | 1.279  |  1.26     |
 | Brit coast| 1.30   |  1.25     |
@@ -24,19 +27,19 @@ More examples and comparisons with theoretical values can be found in the tests 
 | Logistic  | 0.532  |  0.583    |
 | Lorenz    |        |  1.653    |
 
+## Dependencies
 
-#### <i class="icon-pencil"></i> Dependencies
 * [Apache commons math](https://commons.apache.org/)
 
-#### <i class="icon-pencil"></i> License
+## License
+
 The project is under the "GNU General Public License v3.0"
 
+## TODO
 
-**TODOs:**
-
-> - Add approximate slopes for each scale for GeneralizedHurst and MultiFractal analyses.
-> - Add multi-fractal spectrum for the MultiFractal
-> - Add defining scales based on Taken's theorem
-> - Add defining scales based in customer's input
-> - Add defining scales based on watch time (e.g. ms, sec, min, ...)
-> - Add parallel mode
+> Add approximate slopes for each scale for GeneralizedHurst and MultiFractal analyses.
+> Add multi-fractal spectrum for the MultiFractal
+> Add defining scales based on Taken's theorem
+> Add defining scales based in customer's input
+> Add defining scales based on watch time (e.g. ms, sec, min, ...)
+> Add parallel mode

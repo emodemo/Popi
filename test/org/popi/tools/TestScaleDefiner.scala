@@ -1,24 +1,19 @@
 package org.popi.tools
 
-import org.junit.Test
-import scala.collection.immutable.List
-import org.junit.Assert
-import org.hamcrest.CoreMatchers
-import scala.collection.immutable.Map
+import scala.collection.immutable.{List, Map}
+import org.scalatest.{FunSuite, Matchers}
 
-class TestScaleDefiner {
+class TestScaleDefiner extends FunSuite with Matchers {
 
-  @Test
-  def defineScaleSizes = {
+  test("define scale sizes") {
     val expected = Map(1L -> 100.0, 2L -> 50.0, 4L -> 25.0, 8L -> 12.5, 16L -> 6.25, 32L -> 3.125)
-    val result = ScaleDefiner.defineScaleSizes(100)
-    Assert.assertThat(result, CoreMatchers.is(expected))
+    val result = ScaleDefiner.resolutionsAndSizes(100)
+    result should contain allElementsOf expected
   }
 
-  @Test
-  def defineScaleResolutions = {
-    val expected = List(1L,2L,4L,8L,16L,32L)
-    val result = ScaleDefiner.defineScaleResolutions(100)
-    Assert.assertThat(result, CoreMatchers.is(expected))
+  test("define scale resolutions") {
+    val expected = List(1L, 2L, 4L, 8L, 16L, 32L)
+    val result = ScaleDefiner.resolutions(100)
+    result should contain allElementsOf expected
   }
 }

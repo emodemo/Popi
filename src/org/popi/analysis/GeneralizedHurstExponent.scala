@@ -18,8 +18,7 @@
 package org.popi.analysis
 
 import scala.collection.immutable.List
-import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
-import org.popi.wrapper.MathUtil
+import org.popi.stat.{toLog, MathUtil, SimpleRegression}
 import org.popi.tools.ScaleDefiner
 
 /**
@@ -37,19 +36,19 @@ object GeneralizedHurstExponent {
    * H = ζ(q) / q, where ζ(q) is the structure function exponent of the cumulative sums of the data
    *
    * @param data the input data
-   * @param q the q
+   * @param q the q exponent
    * @return a tuple with
    * <li> the generalized Hurst exponent
    * <li> the structure function exponent
    */
-  def generalizedHurstExponent(data: List[Double], q: Double): Tuple2[Double, RegressionSlope] = {
-    val scaleResolutions = ScaleDefiner.defineScaleResolutions(data.size)
-    val structExponent = structureFunctionExponent(cumsums(data), scaleResolutions.map(res => res.toInt), q)
+  def generalizedHurstExponent(data: List[Double], q: Double): (Double, SimpleRegression) = {
+    val scaleResolutions = ScaleDefiner.resolutions(data.size)
+    val structExponent = structureFunctionExponent(cumSums(data), scaleResolutions, q)
     (structExponent.slope / q, structExponent)
   }
 
-  private def cumsums(data: List[Double]): List[Double] = {
-    data.scanLeft(0.0)((cumsum, item) => cumsum + item)
+  private def cumSums(data: List[Double]): List[Double] = {
+    data.scanLeft(0.0)((cumSum, item) => cumSum + item)
   }
 
   /**
@@ -57,14 +56,14 @@ object GeneralizedHurstExponent {
    * Returns a RegressionSlope object where the getSlope() gives the ζ(q)</br>
    *
    * @param dataCumSums cumulative sums of data
-   * @param deltaTs
-   * @param q
+   * @param deltaTs the scales
+   * @param q the q exponent
    * @return a RegressionSlope object where the getSlope() gives the ζ(q)
    */
-  private def structureFunctionExponent(dataCumSums: List[Double], deltaTs: List[Int], q: Double): RegressionSlope = {
-    val tuples = deltaTs.map(delta => (delta.toDouble, structureFunction(dataCumSums, delta, q)))
+  private def structureFunctionExponent(dataCumSums: List[Double], deltaTs: List[Long], q: Double): SimpleRegression = {
+    val tuples = deltaTs.map(delta => (delta.toDouble, structureFunction(dataCumSums, delta.toInt, q)))
      // the x axis is the Δt, the y axis is the S(q)
-    RegressionSlope(RegressionSlopeType.Logarithmic, tuples)
+    SimpleRegression(toLog(tuples))
   }
 
   /**
@@ -77,14 +76,14 @@ object GeneralizedHurstExponent {
    * @return S(q) for Δt = <|x(t+Δt) - x(t)|<sup>q</sup>>
    */
   private def structureFunction(dataCumSums: List[Double], deltaT: Int, q: Double) = {
-    var sum = 0.0;
+    var sum = 0.0
     for(i <- dataCumSums.size until deltaT by -1) {
         // the formula is interpreted backwards so that the older items are omitted, and not the newest
         // ... which is not quite correct as in other analyses the opposite is true :-/
-        sum = sum + MathUtil.pow(MathUtil.abs(dataCumSums(i - 1) - dataCumSums(i - 1 - deltaT)), q);
+        sum = sum + MathUtil.pow(MathUtil.abs(dataCumSums(i - 1) - dataCumSums(i - 1 - deltaT)), q)
     }
     // the mean
-    sum / (dataCumSums.size - deltaT);
+    sum / (dataCumSums.size - deltaT)
   }
 
 }

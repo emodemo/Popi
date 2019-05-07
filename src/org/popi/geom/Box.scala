@@ -15,23 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.popi.analysis.result
+package org.popi.geom
+
+import scala.collection.immutable.List
+
 
 /**
- * {@link RegressionSlope}'s type
+ * Multi-Dimensional box representation
+ *
+ * @param fromCoordinates inclusive from
+ * @param toCoordinates exclusive to
+ *
  * @author Emiliyan Todorov
  *
  */
-object RegressionSlopeType extends Enumeration {
-
- /**
-  * {@link RegressionSlope} type
-  */
-  type RegressionSlopeType = Value
-
-  /**
-   * <li>Logarithmic - the calculation should be made with the logs of the input data
-   * <li>NonLogarithmic - the calculation should be made with the input data as it is
-   */
-  val Logarithmic, NonLogarithmic = Value
-}
+case class Box(fromCoordinates: List[Long], toCoordinates: List[Long]) {}

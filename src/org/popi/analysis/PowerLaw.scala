@@ -16,10 +16,8 @@
  */
 package org.popi.analysis
 
-import scala.collection.immutable.{List, Map}
-import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
-import org.popi.tools.{DataScaler, ScaleDefiner}
-import org.popi.wrapper.Frequency
+import scala.collection.immutable.List
+import org.popi.stat.{toLog, Frequency, SimpleRegression}
 
 /**
  * Calculates the Power Law Exponent for the input data.</br>
@@ -34,35 +32,18 @@ import org.popi.wrapper.Frequency
 object PowerLaw {
 
   /**
-   * Scales the data and calculates the Power Law exponent α for each scale.
-   * @param data the input data
-   * @return key = scale resolution (the delta), value = regression slope
-   */
-  def powerLawExponentScaled(data: List[Double]): Map[Long, RegressionSlope] = {
-    val scaleSizes = ScaleDefiner.defineScaleSizes(data.size)
-    val scaledData = DataScaler.scaleByDeltaResolution(data, scaleSizes)
-    scaledData.map{case (scale, items) => scale -> averageSlope(items)}
-  }
-
-  /**
    * Calculates the Power Law Exponent α
    *
    * @param data the input data
-   * @return the {@link RegressionSlope} for the Power Law Exponent
+   * @return the Power Law Exponent
    */
-  def powerLawExponent(data: List[Double]): RegressionSlope = {
+  def powerLawExponent(data: List[Double]): SimpleRegression = {
     val sortedData = data.sorted
-    val frequency = new Frequency
-    frequency.init(sortedData)
+    val frequency = Frequency(sortedData)
     // remove the biggest (here - the last) value for correct calculation
     // tuple._1 = data tuple._2 = ccdf
     val tuples = sortedData.dropRight(1)
     val tuples2 = tuples.map(item => (item, 1 - frequency.cumulativePercentage(item)))
-    RegressionSlope(RegressionSlopeType.Logarithmic, tuples2)
-  }
-
-  private def averageSlope(groupsInScale : List[List[Double]]): RegressionSlope = {
-    val slopes = groupsInScale.map(group => powerLawExponent(group))
-    RegressionSlope(slopes)
+    SimpleRegression(toLog(tuples2))
   }
 }

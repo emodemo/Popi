@@ -17,12 +17,11 @@
 
 package org.popi.analysis
 
+import org.popi.geom.BoxCounter
+import org.popi.tools.{DataNormalizer, ScaleDefiner}
+import org.popi.stat.{MathUtil, SimpleRegression}
 import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
-import org.popi.analysis.result.{RegressionSlope, RegressionSlopeType}
-import org.popi.geom.{BoxCounter, NDimensionalPoint, NDimensionalBox}
-import org.popi.tools.{DataNormalizer, ScaleDefiner}
-import org.popi.wrapper.MathUtil
 /**
  * Calculates the Generalized dimension for particular q
  * <li> D(q) = τ(q) / q -1
@@ -33,7 +32,7 @@ import org.popi.wrapper.MathUtil
 object MultiFractal {
 
   // sanity check because of apache.commons restrictions
-  private val MINIMUM_SATURATION = 4
+  private val minimumSaturation = 4
 
   /**
    * @param data the input data
@@ -41,24 +40,16 @@ object MultiFractal {
    * @return the mf dimension
    */
   def multiFractals(data:List[List[Double]], q: Double): Double = {
-    val massScale = massesPerScale(data)
+    val length = data.lastOption.getOrElse(List.empty).length
+    val scales = ScaleDefiner.resolutions(length)
+    // make normalized data to points
+    val normalizedData = DataNormalizer.normalizeMultiD(data, 0L, scales.max)
+    val boxesPerScale = BoxCounter.countBoxes(normalizedData.transpose, scales)
+    val filtered = boxesPerScale.filter{case (_, boxes) => boxes.size >= minimumSaturation}
+                                .filter{case (_, boxes) => boxes.size <= length / (minimumSaturation - 1)}
+    val massScale = massFunction(filtered, filtered.size)
     val tauQ = partitionFunctionExponent(massScale, q)
     generalizedDimension(tauQ, q)
-  }
-
-  private def massesPerScale(data:List[List[Double]]): Map[Long, List[Double]] = {
-    val inputDatat = data.lastOption.getOrElse(List.empty)
-    val inputdataSize = inputDatat.size
-    val scales = ScaleDefiner.defineScaleResolutions(inputdataSize)
-    // make normalized data to points
-    val normalizedData = DataNormalizer.normalizeMultiD(data, 0L, scales.max.toLong)
-    val points = normalizedData.transpose.map(point => new NDimensionalPoint(point))
-    // box counting
-    val boxesPerScale = BoxCounter.countBoxes(points, scales.map(scale => scale.toLong))
-    val filtered = boxesPerScale.filter{case (scale, boxes) => boxes.size >= MINIMUM_SATURATION}
-                                .filter{case (scale, boxes) => boxes.size <= inputdataSize / (MINIMUM_SATURATION - 1)}
-    // TODO: inputDataSize is not quite correct to be used here as some of the points might be filtered
-    massFunction(filtered, inputdataSize)
   }
 
   /**
@@ -67,8 +58,8 @@ object MultiFractal {
    *
    * @return
    */
-  private def massFunction(boxesPerScale: Map[Long, List[NDimensionalBox]], totalPoints: Long): Map[Long, List[Double]] = {
-    boxesPerScale.map{case (scale, boxes) => scale ->  boxes.map(box => (box.getNumberOfPoints.toDouble / totalPoints.toDouble))}
+  private def massFunction(boxesPerScale: Map[Long, List[Long]], totalPoints: Long): Map[Long, List[Double]] = {
+    boxesPerScale.map{case (scale, boxes) => scale ->  boxes.map(points => points.toDouble / totalPoints.toDouble)}
   }
 
  /**
@@ -81,28 +72,25 @@ object MultiFractal {
    * <li>p<sub>i</sub>(Δt) = |(X(t<sub>i</sub>+Δt) - X(t<sub>i</sub>)| / Σ|(X(t<sub>i</sub>+Δt) - X(t<sub>i</sub>)|
    *
    * @param massesPerScale map with key - the scale resolution and value - the masses for the scale
-   * @param q the q
+   * @param q the q exponent
    *
-   * @return RegressionSlope, where the slope gives the Partition Function exponent τ(q)
+   * @return the Partition Function exponent τ(q) (the slope)
   */
-  private def partitionFunctionExponent(massesPerScale: Map[Long, List[Double]], q: Double): RegressionSlope = {
-    // TODO: too much Java like
-    var list = List[(Double, Double)]()
+  private def partitionFunctionExponent(massesPerScale: Map[Long, List[Double]], q: Double): SimpleRegression = {
+    val list = ListBuffer[(Double, Double)]()
     if(q != 1.0){
-      massesPerScale.foreach{case (scale, masses) => {
+      massesPerScale.foreach{ case (scale, masses) =>
         val s = masses.foldLeft(0.0)((sum, mass) => sum + MathUtil.pow(mass, q))
-        list = list :+ ((MathUtil.log2(scale), MathUtil.log2(s)))
-        }
+        list += ((MathUtil.log2(scale), MathUtil.log2(s)))
       }
     }
     else {
-      massesPerScale.foreach{case (scale, masses) => {
+      massesPerScale.foreach{ case (scale, masses) =>
         val s = masses.foldLeft(0.0)((sum, mass) => sum + (mass * MathUtil.log2(mass)))
-        list = list :+ ((MathUtil.log2(scale), s))
-    	}}
+        list += ((MathUtil.log2(scale), s))
+    	}
     }
-
-    RegressionSlope(RegressionSlopeType.NonLogarithmic, list)
+    SimpleRegression(list.toList)
   }
 
   /**
@@ -114,11 +102,11 @@ object MultiFractal {
    *
    * @return the D(q)
    */
-  private def generalizedDimension(partitionFunction: RegressionSlope, q: Double): Double = {
+  private def generalizedDimension(partitionFunctionExp: SimpleRegression, q: Double): Double = {
     if(q == 1.0){
-      partitionFunction.slope
+      partitionFunctionExp.slope
     } else {
-      partitionFunction.slope / (q - 1)
+      partitionFunctionExp.slope / (q - 1)
     }
   }
 }

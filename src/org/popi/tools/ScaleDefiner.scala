@@ -19,7 +19,7 @@ package org.popi.tools
 
 import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
-import org.popi.wrapper.MathUtil
+import org.popi.stat.MathUtil
 
 /**
  *
@@ -35,10 +35,10 @@ object ScaleDefiner {
    * @return a list with the resolution of each scale
    * </br> Example: For data with size 100 there are 6 scales with resolutions: 1, 2, 4, 8, 16, 32
    */
-  def defineScaleResolutions(dataSize: Int): List[Long] = {
-    val maxScaleResolution = defineMaxVarietiesOfResolutions(dataSize)
+  def resolutions(dataSize: Int): List[Long] = {
+    val maxVarietiesOfResolutions = MathUtil.log2(dataSize.toDouble).toLong
     val buffer = ListBuffer[Long]()
-    for(i <- 0L until maxScaleResolution){
+    for(i <- 0L until maxVarietiesOfResolutions){
       buffer += MathUtil.pow(2, i).toLong
     }
     buffer.toList
@@ -51,13 +51,8 @@ object ScaleDefiner {
    * </br> Example: For data with size 100 there are 6 scales with sizes: 100, 50, 25, 12.5, 6.25, 3.125
    * </br> corresponding to resolutions: 1, 2, 4, 8, 16, 32
    */
-  def defineScaleSizes(dataSize: Int): Map[Long, Double] = {
-    val resolutions = defineScaleResolutions(dataSize)
-    resolutions.map(resolution => resolution -> (dataSize.toDouble / resolution.toDouble)).toMap
-  }
-
-  private def defineMaxVarietiesOfResolutions(dataSize: Int): Long = {
-    val size = MathUtil.log2(dataSize.toDouble)
-    size.toLong
+  def resolutionsAndSizes(dataSize: Int): Map[Long, Double] = {
+    val rs = resolutions(dataSize)
+    rs.map(resolution => resolution -> (dataSize.toDouble / resolution.toDouble)).toMap
   }
 }

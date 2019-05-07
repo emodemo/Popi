@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.popi.wrapper
+package org.popi.stat
 
 import org.apache.commons.math3.util.FastMath
 

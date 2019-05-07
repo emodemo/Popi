@@ -15,28 +15,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.popi.tools
+package org.popi.stat
 
-import org.apache.commons.math3.ml.distance.EuclideanDistance
 import scala.collection.immutable.List
-import org.popi.wrapper.MathUtil
 
 /**
- * Distance Measurer
+ * A wrapper for frequencies. Currently it uses apache.commons but may change in the future
+ *
  * @author Emiliyan Todorov
  *
  */
-object DistanceMeasurer {
+class Frequency private(val frequency: org.apache.commons.math3.stat.Frequency){
 
   /**
-   * Calculates the Euclidean distance between two multi-dimensional points
-   * @param point1 the coordinates for point 1
-   * @param point2 the coordinates for point 2
-   * @return the Euclidean distance
+   * Returns the cumulative percentage for a give data item based on the initlized input data
+   * @param value the data item
+   * @return the cumulative percentage
    */
-  def euclideanDistance(point1: List[Double], point2: List[Double]): Double = {
-    val dp = point1.zip(point2).map{case (coordinates_p1, coordinates_p2) => coordinates_p1 - coordinates_p2}
-    val sum = dp.map(difference => difference * difference).sum
-    MathUtil.sqrt(sum)
+  def cumulativePercentage(value: Double): Double = frequency.getCumPct(value)
+}
+
+object Frequency {
+  def apply(data: List[Double]): Frequency = {
+    val frequency = new org.apache.commons.math3.stat.Frequency
+    data.foreach(dataItem => frequency.addValue(dataItem))
+    new Frequency(frequency)
   }
 }
