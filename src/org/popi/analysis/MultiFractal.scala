@@ -24,7 +24,7 @@ import scala.collection.immutable.{List, Map}
 import scala.collection.mutable.ListBuffer
 /**
  * Calculates the Generalized dimension for particular q
- * <li> D(q) = τ(q) / q -1
+ * <li> D(q) = τ(q) / q - 1
  * <br> q values => 0: capacity dimension, 1: information dimension, 2: correlation dimension, ...
  *
  * @author Emiliyan Todorov
@@ -47,18 +47,18 @@ object MultiFractal {
     val boxesPerScale = BoxCounter.countBoxes(normalizedData.transpose, scales)
     val filtered = boxesPerScale.filter{case (_, boxes) => boxes.size >= minimumSaturation}
                                 .filter{case (_, boxes) => boxes.size <= length / (minimumSaturation - 1)}
-    val massScale = massFunction(filtered, filtered.size)
+    val massScale = partitionFunction(filtered, filtered.size)
     val tauQ = partitionFunctionExponent(massScale, q)
     generalizedDimension(tauQ, q)
   }
 
   /**
-   * Calculates the mass function</br>
+   * Calculates the partition (or mass) function</br>
    * μ<sub>i</sub> = (points in box<sub>i</sub>) / (all points)
    *
    * @return
    */
-  private def massFunction(boxesPerScale: Map[Long, List[Long]], totalPoints: Long): Map[Long, List[Double]] = {
+  private def partitionFunction(boxesPerScale: Map[Long, List[Long]], totalPoints: Long): Map[Long, List[Double]] = {
     boxesPerScale.map{case (scale, boxes) => scale ->  boxes.map(points => points.toDouble / totalPoints.toDouble)}
   }
 

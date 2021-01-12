@@ -17,8 +17,7 @@
 
 package org.popi.geom
 
-import org.popi.stat.MathUtil
-
+import org.popi.stat.MathUtil.{pow, abs, sqrt}
 import scala.collection.immutable.List
 
 /**
@@ -30,14 +29,37 @@ import scala.collection.immutable.List
 object Distances {
 
   /**
-   * Calculates the Euclidean distance between two multi-dimensional points
-   * @param point1 the coordinates for point 1
-   * @param point2 the coordinates for point 2
-   * @return the Euclidean distance
-   */
-  def euclidean(point1: List[Double], point2: List[Double]): Double = {
-    val dp = point1.zip(point2).map{case (coordinates_p1, coordinates_p2) => coordinates_p1 - coordinates_p2}
-    val sum = dp.map(difference => difference * difference).sum
-    MathUtil.sqrt(sum)
+    * Calculates the distance between two multi-dimensional points
+    * @param point1 the coordinates for point 1
+    * @param point2 the coordinates for point 2
+    * @return the distance
+    */
+  def euclidean(point1: List[Double], point2: List[Double]): Double =
+    pNorm(2, point1, point2)
+
+  /**
+    * Calculates the distance between two multi-dimensional points
+    * @param pnorm the p norm (e.g. >1 for Minkowski, 1 for Manhattan, 2 for Euclidean, +inf for Chebishev, ...)
+    * @param point1 the coordinates for point 1
+    * @param point2 the coordinates for point 2
+    * @return the distance or NaN if pnorm < l.0
+    */
+  def pNorm(pnorm: Double, point1: List[Double], point2: List[Double]): Double = {
+
+    def difference = point1.zip(point2).map{case (coordinates_p1, coordinates_p2) => abs(coordinates_p1 - coordinates_p2)}
+
+    pnorm match {
+        // TODO: implement for p < 1
+      case _ if pnorm < 1 => Double.NaN
+      case 1.0 => difference.sum
+      case 2.0 =>
+        val sum = difference.map(x => x * x).sum
+        sqrt(sum)
+      case Double.PositiveInfinity => difference.max
+      // case Double.NegativeInfinity => difference.min
+      case p: Double =>
+        val sum = difference.map(x => pow(x, p)).sum
+        pow(sum, 1/p)
+    }
   }
 }

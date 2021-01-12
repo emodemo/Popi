@@ -41,9 +41,8 @@ object PowerLaw {
     val sortedData = data.sorted
     val frequency = Frequency(sortedData)
     // remove the biggest (here - the last) value for correct calculation
-    // tuple._1 = data tuple._2 = ccdf
-    val tuples = sortedData.dropRight(1)
-    val tuples2 = tuples.map(item => (item, 1 - frequency.cumulativePercentage(item)))
-    SimpleRegression(toLog(tuples2))
+    val sorted = sortedData.dropRight(1)
+    val ccdf = sorted.map(item => (item, 1 - frequency.cumulativePercentage(item)))
+    SimpleRegression(toLog(ccdf))
   }
 }

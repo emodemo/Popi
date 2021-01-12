@@ -31,18 +31,19 @@ import org.popi.stat.{toLog, MathUtil, SimpleRegression}
 object HurstExponent {
 
   /**
-    * Performs the Hurst Exponent Analysis
+    * Performs the Hurst Exponent Analysis </br>
+    * H = log(R/S) / log(Δt)
     *
     * @param data the input data
     * @return a { @link RegressionSlope} for Hurst Exponent
     */
   def hurstExponent(data: List[Double]): SimpleRegression = {
-    val scaleSizes = ScaleDefiner.resolutionsAndSizes(data.size)
+    val scaleSizes = ScaleDefiner.resolutionsAndSizes(data.length)
     val scaledData = DataScaler.scaleBySize(data, scaleSizes)
     val tuples = scaledData.map {
       case (scale, items) =>
       val sum = items.map(item => rescaledRange(item)).sum
-      (scale.toDouble, sum / items.size)
+      (scale, sum / items.length)
     }
     SimpleRegression(toLog(tuples.toList))
   }
@@ -51,7 +52,7 @@ object HurstExponent {
   /**
     * Calculate Rescaled Range statistics for given interval or section.</br>
     * The following calculations are done:
-    * <li> mean of the range: m = 1/n Σ(all X)
+    * <li>mean of the range: m = 1/n Σ(all X)
     * <li>deviation form the mean: Yi = (Xi - m)
     * <li>cumulativeSum of deviations: Zi = sum(Y1 to Yi)
     * <li>min and max of cumulative sum of deviations: max(all Z) - min(all Z)
@@ -64,18 +65,18 @@ object HurstExponent {
   def rescaledRange(data: List[Double]): Double = {
     val average = data.sum / data.size
     val deviations = data.map(item => item - average)
-    var deviationsCumsum = 0.0
-    val deviationsCumsums = ListBuffer[Double]()
-    var deviationsPowsum = 0.0
+    var deviationsCumSum = 0.0
+    val deviationsCumSums = ListBuffer[Double]()
+    var deviationsPowSum = 0.0
 
     deviations.foreach(deviation => {
-      deviationsCumsum += deviation
-      deviationsPowsum += MathUtil.pow(deviation, 2)
-      deviationsCumsums += deviationsCumsum
+      deviationsCumSum += deviation
+      deviationsPowSum += MathUtil.pow(deviation, 2)
+      deviationsCumSums += deviationsCumSum
     })
 
-    val range = deviationsCumsums.max - deviationsCumsums.min
-    val sdPopulation = MathUtil.sqrt(deviationsPowsum / data.size)
+    val range = deviationsCumSums.max - deviationsCumSums.min
+    val sdPopulation = MathUtil.sqrt(deviationsPowSum / data.size)
     range / sdPopulation
   }
 }

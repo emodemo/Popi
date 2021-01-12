@@ -67,8 +67,8 @@ object GeneralizedHurstExponent {
   }
 
   /**
-   * S(q) for Δt = (1/T-Δt) * Σ(from <i>t=0</i> to <i>T-Δt-1</i>) |x(t+Δt) -
-   * x(t)|<sup>q</sup></br> where T is the whole data set
+   * S(q) for Δt = (1/T-Δt) * Σ(from <i>t=0</i> to <i>T-Δt-1</i>) |x(t+Δt) - x(t)|<sup>q</sup></br>
+   * where T is the observation period
    *
    * @param dataCumSums cumulative sums of data
    * @param deltaT the Δt

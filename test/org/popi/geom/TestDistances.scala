@@ -27,4 +27,12 @@ class TestDistances extends FunSuite with Matchers {
     distance should be (1.73205 +- 0.00005)
   }
 
+  // TODO: additional tests for lp norm, tests for the algebraic laws
+  test("NaN") {
+    val point1 = List[Double](1, 3, 5)
+    val point2 = List[Double](2, 4, 6)
+    val distance = Distances.pNorm(0.9, point1, point2)
+    assert(distance.isNaN)
+  }
+
 }
